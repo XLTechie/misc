@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Here's something to listen to.
+    url: https://dailyaudiobible.com
+    about: This is where the real fun goes down.
+  - name: HTML Testing Template <a href="https://google.com/">A link</a>
+    url: #mydiv
+    about: <div style="hidden"This is a hidden div.</div>Am I showing?
