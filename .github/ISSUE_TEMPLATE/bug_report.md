@@ -1,6 +1,6 @@
 ---
-name: 
-about: 
+name: Bug report
+about: Tell daddy what's wrong...
 title: ''
 labels: ''
 assignees: ''
