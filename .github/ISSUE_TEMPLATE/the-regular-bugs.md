@@ -1,6 +1,6 @@
 ---
-name: 
-about: 
+name: The regular bugs
+about: "## For just regular problems. How's your day?"
 title: ''
 labels: ''
 assignees: ''

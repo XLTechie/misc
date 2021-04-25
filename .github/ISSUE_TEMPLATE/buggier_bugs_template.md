@@ -1,6 +1,6 @@
 ---
-name: ## Even worse Bug report
-about: ## Don't bug out! Tell us where we went wrong.
+name: 
+about: 
 title: ''
 labels: ''
 assignees: ''

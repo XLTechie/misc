@@ -1,6 +1,6 @@
 ---
-name: 
-about: 
+name: "## These are the even worse bugs"
+about: "## Don't bug out! Fill this in instead."
 title: ''
 labels: ''
 assignees: ''
