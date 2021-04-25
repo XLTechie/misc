@@ -4,5 +4,5 @@ contact_links:
     url: https://dailyaudiobible.com
     about: This is where the real fun goes down.
   - name: HTML Testing Template
-    url: #mydiv
-    about: Cronk all that schnizzle
+    url: test.html
+    about: <div style="hidden">This is a hidden div.</div>Am I showing?
