@@ -16,29 +16,28 @@ def _(arg):
 # Add-on information variables
 addon_info = {
 	# add-on Name/identifier, internal for NVDA
-	"addon_name": "addonTemplate",
+	"addon_name": "lukesProofOfConcept",
 	# Add-on summary, usually the user visible name of the addon.
 	# Translators: Summary for this add-on
 	# to be shown on installation and add-on information found in Add-ons Manager.
-	"addon_summary": _("Add-on user visible name"),
+	"addon_summary": _("Luke's Proof of Concept and Testing"),
 	# Add-on description
 	# Translators: Long description to be shown for this add-on on add-on information from add-ons manager
-	"addon_description": _("""Description for the add-on.
-It can span multiple lines."""),
+	"addon_description": _("""Testing ideas for demonstration purposes. Please remove after tests complete."""),
 	# version
-	"addon_version": "x.y",
+	"addon_version": "0.1",
 	# Author(s)
-	"addon_author": "name <name@domain.com>",
+	"addon_author": "Luke Davis (@XLTechie)",
 	# URL for the add-on documentation support
-	"addon_url": None,
+	"addon_url": "https://github.com/XLTechie/misc/#readme",
 	# URL for the add-on repository where the source code can be found
-	"addon_sourceURL": None,
+	"addon_sourceURL": "https://github.com/XLTechie/misc/",
 	# Documentation file name
 	"addon_docFileName": "readme.html",
 	# Minimum NVDA version supported (e.g. "2018.3.0", minor version is optional)
-	"addon_minimumNVDAVersion": None,
+	"addon_minimumNVDAVersion": "2023.1",
 	# Last NVDA version supported/tested (e.g. "2018.4.0", ideally more recent than minimum version)
-	"addon_lastTestedNVDAVersion": None,
+	"addon_lastTestedNVDAVersion": "2023.1",
 	# Add-on update channel (default is None, denoting stable releases,
 	# and for development releases, use "dev".)
 	# Do not change unless you know what you are doing!
@@ -54,10 +53,9 @@ It can span multiple lines."""),
 # or use glob expressions.
 # For example to include all files with a ".py" extension from the "globalPlugins" dir of your add-on
 # the list can be written as follows:
-# pythonSources = ["addon/globalPlugins/*.py"]
+pythonSources = ["addon/globalPlugins/*.py"]
 # For more information on SCons Glob expressions please take a look at:
 # https://scons.org/doc/production/HTML/scons-user/apd.html
-pythonSources = []
 
 # Files that contain strings for translation. Usually your python sources
 i18nSources = pythonSources + ["buildVars.py"]
