@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - pytests
+  workflow_dispatch:
 
 jobs:
   build:
