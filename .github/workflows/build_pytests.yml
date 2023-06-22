@@ -30,6 +30,7 @@ jobs:
       - name: Artifact upload
         uses: actions/upload-artifact@v3
         with:
+          name: dist
           if-no-files-found: error
           retention-days: 3
           path: |
@@ -50,8 +51,6 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          dist/*.exe
-          dist/*.EXE
-          dist/*.spec
+          dist/*
         fail_on_unmatched_files: true
         prerelease: ${{ contains(github.ref, '-') }}
