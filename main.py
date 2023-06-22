@@ -7,6 +7,7 @@ import threading
 class App(wx.App):
     def OnInit(self):
         self.frame = wx.Frame(None, title="Artifact Downloader")
+        wx.GetApp().SetTopWindow(self.frame)
         self.frame.Show()
         self.repository = github.Repository("XLTechie", "misc")
         self.artifacts_folder = os.path.expandvars(r"%temp%\artifacts")
@@ -25,6 +26,8 @@ class App(wx.App):
                         artifact.download(filepath)
 
 if __name__ == "__main__":
+    input("app = App(). Press enter.")
     app = App()
+    input("Starting main loop. Press enter.")
     app.MainLoop()
     input("Wait a while.")
