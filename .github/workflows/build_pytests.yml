@@ -2,16 +2,13 @@ name: Compile pytests to Windows Executable
 
 on:
   push:
-    tags: ["*"]
+    tags: ["py*"]
 
 jobs:
   build:
     timeout-minutes: 15
     runs-on: windows-latest
     steps:
-      - name: Branch limiter
-        if: endsWith(github.event.base_ref, 'pytests') == false
-        run: exit -1
       - name: checkout
         uses: actions/checkout@v3
       - name: Setup Python
