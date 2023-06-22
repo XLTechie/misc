@@ -2,6 +2,7 @@ name: Compile pytests to Windows Executable
 
 on:
   push:
+    tags: ["*"]
     branches:
       - pytests
   workflow_dispatch:
@@ -16,23 +17,24 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.10
+          python-version: 3.9
       - name: Install build deps
         shell: cmd
         run: |
           pip install wxPython
           pip install pyinstaller
           pip install pyinstaller[encryption]
-      - name: Compile to Windows executable
+      - name: Compile
         shell: cmd
-        run: pyinstaller -y --onefile --windowed --name=testApp main.py*
-      - name: Upload the artifact
+        run: pyinstaller --specpath dist -y --onefile --name=testApp main.py
+      - name: Artifact upload
         uses: actions/upload-artifact@v3
         with:
-          name: dist
+          if-no-files-found: error
+          retention-days: 3
           path: |
-            ./*.exe
-            ./*.EXE
+            dist/*.exe
+            dist/*.spec
 
   upload_release:
     runs-on: ubuntu-latest
@@ -42,13 +44,14 @@ jobs:
     - uses: actions/checkout@v3
     - name: download releases files
       uses: actions/download-artifact@v3
-#    - name: Display structure of downloaded files
-#      run: ls -R
+    - name: Display structure of downloaded files
+      run: ls -R
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
         files: |
           dist/*.exe
           dist/*.EXE
+          dist/*.spec
         fail_on_unmatched_files: true
         prerelease: ${{ contains(github.ref, '-') }}
