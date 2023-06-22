@@ -1,0 +1,56 @@
+name: Compile pytests to Windows Executable
+
+on:
+  push:
+    tags: ["*"]
+
+jobs:
+  build:
+    timeout-minutes: 15
+    runs-on: windows-latest
+    steps:
+      - name: Branch limiter
+        if: endsWith(github.event.base_ref, 'pytests') == false
+        run: exit -1
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: Install build deps
+        shell: cmd
+        run: |
+          pip install wxPython
+          pip install pyinstaller
+          pip install pyinstaller[encryption]
+      - name: Compile
+        shell: cmd
+        run: pyinstaller --specpath dist -y --onefile --name=testApp main.py
+      - name: Artifact upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          if-no-files-found: error
+          retention-days: 3
+          path: |
+            dist/*.exe
+            dist/*.spec
+
+  upload_release:
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    needs: ["build"]
+    steps:
+    - uses: actions/checkout@v3
+    - name: download releases files
+      uses: actions/download-artifact@v3
+    - name: Display structure of downloaded files
+      run: ls -R
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          dist/*
+        fail_on_unmatched_files: true
+        prerelease: ${{ contains(github.ref, '-') }}
