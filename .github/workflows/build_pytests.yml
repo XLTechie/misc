@@ -1,4 +1,5 @@
 name: Compile pytests to Windows Executable
+
 on:
   push:
     branches:
@@ -7,14 +8,47 @@ on:
 
 jobs:
   build:
+    timeout-minutes: 10
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4 # Original had v2
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: 3.10
-          cache: 'pip' # Taken from an NVDA add-on builder, not in original
-      - name: Install deps
-        run: pip install wx
-      - name: Compile to Windows Executable
-        run: pyinstaller testCode.py --onefile --windowed
+      - name: Install build deps
+        shell: cmd
+        run: |
+          pip install wxPython
+          pip install pyinstaller
+          pip install pyinstaller[encryption]
+      - name: Compile to Windows executable
+        shell: cmd
+        run: pyinstaller -y --onefile --windowed --name=testApp main.py*
+      - name: Upload the artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: |
+            ./*.exe
+            ./*.EXE
+
+  upload_release:
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    needs: ["build"]
+    steps:
+    - uses: actions/checkout@v3
+    - name: download releases files
+      uses: actions/download-artifact@v3
+#    - name: Display structure of downloaded files
+#      run: ls -R
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          dist/*.exe
+          dist/*.EXE
+        fail_on_unmatched_files: true
+        prerelease: ${{ contains(github.ref, '-') }}
