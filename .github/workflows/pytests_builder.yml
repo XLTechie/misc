@@ -18,13 +18,3 @@ jobs:
         run: pip install wx
       - name: Compile to Windows Executable
         run: pyinstaller testCode.py --onefile --windowed
-      - name: Send Email
-        uses: actions/email@v2
-        with:
-          to: ${{github.actor}}
-          subject: Python test executable
-          body: |
-            Hi, this is GitHub Actions.
-
-            I've attached the compiled test executable.
-          attachment: dist/testCode.exe
