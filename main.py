@@ -80,3 +80,4 @@ if __name__ == "__main__":
     app = wx.App()
     downloader = ArtifactDownloader()
     app.MainLoop()
+    input("Press enter to exit.")
