@@ -1,4 +1,4 @@
-name: Compile to Windows Executable and Email
+name: Compile pytests to Windows Executable
 on:
   push:
     branches:
