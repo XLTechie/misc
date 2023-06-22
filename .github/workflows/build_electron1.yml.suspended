@@ -1,0 +1,19 @@
+name: Build Electron App
+on:
+  push:
+    branches:
+      - electron:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Install Electron Builder
+        run: npm install electron-builder
+      - name: Build Electron App
+        run: electron-builder build --target=windows
+
