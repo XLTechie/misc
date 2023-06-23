@@ -1,11 +1,6 @@
 import os
-import logging
-from time import strftime
-LOG_FILE = r"%temp%\testApp.log"
 
 try:
-	logging.basicConfig(level=logging.INFO, filename=os.path.abspath(os.path.expandvars(LOG_FILE)), filemode="w")
-	logging.info("Log started at " + strftime("%x %X"))
 
 	# Was artifact watcher 2
 	import wx
@@ -40,10 +35,5 @@ try:
 	if __name__ == "__main__":
 		main()
 
-except Exception as e:
-	logging.exception("Exception occurred")
-	logging.info("Terminating in failure.")
-else:
-	logging.info("Terminating successfully.")
 finally:
-	logging.info("Shutting down.")
+	input("Press enter.")
