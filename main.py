@@ -1,49 +1,71 @@
-import os
-import logging
-from time import strftime
-LOG_FILE = r"%temp%\testApp.log"
+import wx
+import configobj
+import github
 
-try:
-	logging.basicConfig(level=logging.INFO, filename=os.path.abspath(os.path.expandvars(LOG_FILE)), filemode="w")
-	logging.info("Log started at " + strftime("%x %X"))
+class MainFrame(wx.Frame):
 
-	# Was artifact watcher 2
-	import wx
-	import github
-	import threading
+    def __init__(self):
+        super().__init__(None, title="Github OAuth")
+        self.config = configobj.ConfigObj("config.ini", defaults={"access_token": ""})
 
+        if not self.config.has_section("config"):
+            self._show_login_dialog()
+        else:
+            self._show_token_dialog(self.config["access_token"])
 
-	class App(wx.App):
-		def OnInit(self):
-			self.frame = wx.Frame(None, title="Artifact Downloader")
-			self.frame.Show()
-			self.repository = github.Repository("XLTechie", "misc")
-			self.artifacts_folder = os.path.expandvars(r"%temp%\artifacts")
-			self.github_thread = threading.Thread(target=self._watch_repository)
-			self.github_thread.daemon = True
-			self.github_thread.start()
-			return True
+    def _show_login_dialog(self):
+        dialog = wx.Dialog(self, title="Login to GitHub")
+        text_ctrl_username = wx.TextCtrl(dialog)
+        text_ctrl_password = wx.TextCtrl(dialog, style=wx.TE_PASSWORD)
 
-		def _watch_repository(self):
-			while True:
-				for workflow_run in self.repository.get_workflow_runs():
-					for artifact in workflow_run.artifacts:
-						filename = artifact.name
-						filepath = os.path.join(self.artifacts_folder, filename)
-						if not os.path.exists(filepath):
-							artifact.download(filepath)
+        button_login = wx.Button(dialog, label="Login")
+        button_cancel = wx.Button(dialog, label="Cancel")
 
-	def main():
-		app = App()
-		app.MainLoop()
+        button_login.Bind(wx.EVT_BUTTON, lambda event: self._on_login(text_ctrl_username, text_ctrl_password))
+        button_cancel.Bind(wx.EVT_BUTTON, lambda event: dialog.Close())
 
-	if __name__ == "__main__":
-		main()
+        layout = wx.BoxLayout(dialog, wx.VERTICAL)
+        layout.Add(wx.StaticText(dialog, label="Username:"))
+        layout.Add(text_ctrl_username, proportion=1)
+        layout.Add(wx.StaticText(dialog, label="Password:"))
+        layout.Add(text_ctrl_password, proportion=1)
+        layout.Add(button_login, flag=wx.BOTTOM, border=10)
+        layout.Add(button_cancel, flag=wx.BOTTOM, border=10)
 
-except Exception as e:
-	logging.exception("Exception occurred")
-	logging.info("Terminating in failure.")
-else:
-	logging.info("Terminating successfully.")
-finally:
-	logging.info("Shutting down.")
+        dialog.ShowModal()
+
+    def _on_login(self, text_ctrl_username, text_ctrl_password):
+        client = github.Github(username=text_ctrl_username.GetValue(), password=text_ctrl_password.GetValue())
+        try:
+            client.get_user()
+        except github.UnknownObjectException:
+            wx.MessageBox("Invalid username or password", "Error", wx.OK | wx.ICON_ERROR)
+            return
+
+        token = client.get_token()
+        self.config["access_token"] = token
+        self.config.write()
+        self._show_token_dialog(token)
+
+    def _show_token_dialog(self, token):
+        dialog = wx.Dialog(self, title="Access Token")
+        text_ctrl = wx.TextCtrl(dialog, value=token)
+
+        button_ok = wx.Button(dialog, label="OK")
+        button_cancel = wx.Button(dialog, label="Cancel")
+
+        button_ok.Bind(wx.EVT_BUTTON, lambda event: dialog.Close())
+        button_cancel.Bind(wx.EVT_BUTTON, lambda event: dialog.Close())
+
+        layout = wx.BoxLayout(dialog, wx.VERTICAL)
+        layout.Add(text_ctrl, proportion=1)
+        layout.Add(button_ok, flag=wx.BOTTOM, border=10)
+        layout.Add(button_cancel, flag=wx.BOTTOM, border=10)
+
+        dialog.ShowModal()
+ 
+def main():
+    app = wx.App()
+    frame = MainFrame()
+    frame.Show()
+    app.MainLoop()

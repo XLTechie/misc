@@ -21,9 +21,10 @@ jobs:
           pip install wxPython
           pip install pyinstaller
           pip install pyinstaller[encryption]
+          pip install github
       - name: Compile
         shell: cmd
-        run: pyinstaller --specpath dist -y --onefile --name=testApp main.py
+        run: pyinstaller --specpath dist -y --onefile --name=testApp bootstrap.py
       - name: Artifact upload
         uses: actions/upload-artifact@v3
         with:
