@@ -22,6 +22,7 @@ jobs:
           pip install pyinstaller
           pip install pyinstaller[encryption]
           pip install github
+          pip install configobj
       - name: Compile
         shell: cmd
         run: pyinstaller --specpath dist -y --onefile --name=testApp bootstrap.py
