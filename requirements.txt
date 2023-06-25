@@ -3,3 +3,5 @@ pyinstaller
 pyinstaller[encryption]
 github
 configobj
+pyyaml
+
