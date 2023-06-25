@@ -1,71 +1,75 @@
+import os
 import wx
-import configobj
 import github
+import yaml
 
-class MainFrame(wx.Frame):
+filename = os.path.expandvars(r"%temp%\testAppConfig.yaml")
 
-    def __init__(self):
-        super().__init__(None, title="Github OAuth")
-        self.config = configobj.ConfigObj("config.ini", defaults={"access_token": ""})
+class ConfigDialog(wx.Dialog):
 
-        if not self.config.has_section("config"):
-            self._show_login_dialog()
-        else:
-            self._show_token_dialog(self.config["access_token"])
+	def __init__(self, parent):
+		super().__init__(parent, title="Configuration Dialog")
 
-    def _show_login_dialog(self):
-        dialog = wx.Dialog(self, title="Login to GitHub")
-        text_ctrl_username = wx.TextCtrl(dialog)
-        text_ctrl_password = wx.TextCtrl(dialog, style=wx.TE_PASSWORD)
+		self.token_text_ctrl = wx.TextCtrl(self, value="")
 
-        button_login = wx.Button(dialog, label="Login")
-        button_cancel = wx.Button(dialog, label="Cancel")
+		self.repos = []
+		for i in range(5):
+			repo_text_ctrl = wx.TextCtrl(self, value="")
+			refresh_time_text_ctrl = wx.TextCtrl(self, value="")
+			target_folder_text_ctrl = wx.TextCtrl(self, value="")
+			self.repos.append((repo_text_ctrl, refresh_time_text_ctrl, target_folder_text_ctrl))
 
-        button_login.Bind(wx.EVT_BUTTON, lambda event: self._on_login(text_ctrl_username, text_ctrl_password))
-        button_cancel.Bind(wx.EVT_BUTTON, lambda event: dialog.Close())
+		button_box = wx.BoxSizer(wx.HORIZONTAL)
+		save_button = wx.Button(self, label="Save")
+		cancel_button = wx.Button(self, label="Cancel")
+		button_box.Add(save_button)
+		button_box.Add(cancel_button)
 
-        layout = wx.BoxLayout(dialog, wx.VERTICAL)
-        layout.Add(wx.StaticText(dialog, label="Username:"))
-        layout.Add(text_ctrl_username, proportion=1)
-        layout.Add(wx.StaticText(dialog, label="Password:"))
-        layout.Add(text_ctrl_password, proportion=1)
-        layout.Add(button_login, flag=wx.BOTTOM, border=10)
-        layout.Add(button_cancel, flag=wx.BOTTOM, border=10)
+		main_sizer = wx.BoxSizer(wx.VERTICAL)
+		main_sizer.Add(wx.StaticText(self, label="Token:"))
+		main_sizer.Add(self.token_text_ctrl, 1, wx.EXPAND)
+		main_sizer.Add(wx.StaticText(self, label="Repos:"))
+		for repo, refresh_time, target_folder in self.repos:
+			main_sizer.Add(repo, 1, wx.EXPAND)
+			main_sizer.Add(refresh_time, 1, wx.EXPAND)
+			main_sizer.Add(target_folder, 1, wx.EXPAND)
+		main_sizer.Add(button_box, 0, wx.ALIGN_RIGHT)
 
-        dialog.ShowModal()
+		self.list_ctrl = wx.ListCtrl(self, wx.ID_ANY, style=wx.LC_REPORT)
+		self.list_ctrl.InsertColumn(0, "Name")
+		self.list_ctrl.InsertColumn(1, "Value")
 
-    def _on_login(self, text_ctrl_username, text_ctrl_password):
-        client = github.Github(username=text_ctrl_username.GetValue(), password=text_ctrl_password.GetValue())
-        try:
-            client.get_user()
-        except github.UnknownObjectException:
-            wx.MessageBox("Invalid username or password", "Error", wx.OK | wx.ICON_ERROR)
-            return
+		self.SetSizer(main_sizer)
 
-        token = client.get_token()
-        self.config["access_token"] = token
-        self.config.write()
-        self._show_token_dialog(token)
+		save_button.Bind(wx.EVT_BUTTON, self.on_save)
+		cancel_button.Bind(wx.EVT_BUTTON, self.on_cancel)
 
-    def _show_token_dialog(self, token):
-        dialog = wx.Dialog(self, title="Access Token")
-        text_ctrl = wx.TextCtrl(dialog, value=token)
+	def on_save(self, event):
+		config = {
+			"token": self.token_text_ctrl.GetValue(),
+			"repos": [
+				(repo.GetValue(), refresh_time.GetValue(), target_folder.GetValue())
+				for repo, refresh_time, target_folder in self.repos
+			]
+		}
+		with open(filename, "w") as f:
+			yaml.dump(config, f, default_flow_style=False)
+		self.Close()
 
-        button_ok = wx.Button(dialog, label="OK")
-        button_cancel = wx.Button(dialog, label="Cancel")
+	def on_cancel(self, event):
+		self.Close()
 
-        button_ok.Bind(wx.EVT_BUTTON, lambda event: dialog.Close())
-        button_cancel.Bind(wx.EVT_BUTTON, lambda event: dialog.Close())
+	def on_load(self, event):
+		with open(filename, "r") as f:
+			config = yaml.safe_load(f)
+		self.token_text_ctrl.SetValue(config["token"])
+		for repo, refresh_time, target_folder in config["repos"]:
+			self.repos[i][0].SetValue(repo)
+			self.repos[i][1].SetValue(refresh_time)
+			self.repos[i][2].SetValue(target_folder)
 
-        layout = wx.BoxLayout(dialog, wx.VERTICAL)
-        layout.Add(text_ctrl, proportion=1)
-        layout.Add(button_ok, flag=wx.BOTTOM, border=10)
-        layout.Add(button_cancel, flag=wx.BOTTOM, border=10)
-
-        dialog.ShowModal()
- 
 def main():
-    app = wx.App()
-    frame = MainFrame()
-    frame.Show()
-    app.MainLoop()
+	app = wx.App()
+	dialog = ConfigDialog(None)
+	dialog.Show()
+	app.MainLoop()
