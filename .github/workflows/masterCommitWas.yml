@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Pre-checkout hash
-      echo "### SHA of master is: $GITHUB_SHA" >> $GITHUB_STEP_SUMMARY
+      run: echo "### SHA of master is: $GITHUB_SHA" >> $GITHUB_STEP_SUMMARY
     - uses: actions/checkout@main
     - name: Post-checkout sha
-      echo "### SHA of master is: $GITHUB_SHA" >> $GITHUB_STEP_SUMMARY
+      run: echo "### SHA of master is: $GITHUB_SHA" >> $GITHUB_STEP_SUMMARY
