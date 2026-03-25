@@ -2,7 +2,7 @@ name: Show current master in step summary
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '0,4,8,12,16,20,24,28,32,36,40,44,48,52,55,59 * * * *'
 
 jobs:
   emitCommit:
